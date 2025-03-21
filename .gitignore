@@ -112,3 +112,5 @@ dist/
 *.swo
 *.kate-swp
 *.lock
+
+content/
