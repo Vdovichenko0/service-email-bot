@@ -66,9 +66,7 @@ def send_email(to_email: str, subject: str, message: str, file_path: str = None)
         server.sendmail(MY_EMAIL, to_email, msg.as_string())
         server.quit()
 
-        os.remove(file_path)
-        logging.info(f"🗑 File deleted: {file_path}")
-        logging.info("✅ Email sent successfully!")
+        # os.remove(file_path)
         return True
 
     except Exception as e:
@@ -119,14 +117,12 @@ def send_email_with_files(to_email: str, subject: str, message: str, file_paths:
         server.sendmail(MY_EMAIL, to_email, msg.as_string())
         server.quit()
 
-        for path in file_paths:
-            try:
-                os.remove(path)
-                logging.info(f"🗑 File deleted: {path}")
-            except Exception as e:
-                logging.warning(f"⚠️ Failed to delete {path}: {e}")
+        # for path in file_paths:
+        #     try:
+        #         os.remove(path)
+        #     except Exception as e:
+        #         logging.warning(f"⚠️ Failed to delete {path}: {e}")
 
-        logging.info("✅ Email with multiple files sent successfully!")
         return True
 
     except Exception as e:

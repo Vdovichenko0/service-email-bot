@@ -1,13 +1,12 @@
 import logging
 import os
 import asyncio
-import mimetypes
 from uuid import uuid4
 from aiogram.fsm.context import FSMContext
 from src.telegram.register_fsm import register_router
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
-from src.user.user_service import set_recipient, get_by_id
+from src.user.user_service import set_recipient, get_by_id, increment_sent_emails
 from src.configs.mongodb import users_collection
 from src.email.email_service import send_email, send_email_with_files
 from src.telegram.keyboard import main_keyboard, choice_recipient_keyboard, send_many_keyboard
@@ -121,6 +120,7 @@ async def send_media_group_files(message: Message, state: FSMContext):
     )
 
     if success:
+        await increment_sent_emails(users_collection, user_id)
         await message.answer("✅ All files sent successfully!", reply_markup=main_keyboard)
     else:
         await message.answer("❌ Failed to send files.", reply_markup=main_keyboard)
@@ -156,7 +156,7 @@ async def receive_any_file(message: Message, state: FSMContext):
         filename = f"content/tmp/{message.from_user.id}_{uuid4()}.{ext}"
         try:
             file_info = await bot.get_file(file.file_id)
-            await bot.download(file_info, filename)
+            await bot.download(file_info.file_path, filename)
             files.append(filename)
             await state.update_data(files=files)
             logging.info(f"📎 [GROUP] Файл добавлен: {filename}")
@@ -185,7 +185,8 @@ async def process_compressed_photo(message: Message):
 
     try:
         file_info = await bot.get_file(photo.file_id)
-        await bot.download(file_info, file_path)
+        await bot.download(file_info.file_path, file_path)
+
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -197,7 +198,7 @@ async def process_compressed_photo(message: Message):
             message=f"{name_official} sent a compressed image.",
             file_paths=[file_path]
         )
-
+        await increment_sent_emails(users_collection, user_id)
         new_text = "📨 Your compressed image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
         await sent_message.edit_text(new_text)
 
@@ -216,7 +217,7 @@ async def process_original_photo(message: Message):
 
     try:
         file_info = await bot.get_file(document.file_id)
-        await bot.download(file_info, file_path)
+        await bot.download(file_info.file_path, file_path)
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -228,7 +229,7 @@ async def process_original_photo(message: Message):
             message=f"{name_official} sent a high-quality image.",
             file_paths=[file_path]
         )
-
+        await increment_sent_emails(users_collection, user_id)
         new_text = "📨 Your high-quality image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
         await sent_message.edit_text(new_text)
 
@@ -247,7 +248,8 @@ async def process_document(message: Message):
 
     try:
         file_info = await bot.get_file(document.file_id)
-        await bot.download(file_info, file_path)
+        await bot.download(file_info.file_path, file_path)
+
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -259,7 +261,7 @@ async def process_document(message: Message):
             message=f"{name_official} sent a document.",
             file_paths=[file_path]
         )
-
+        await increment_sent_emails(users_collection, user_id)
         new_text = "📨 Your document has been sent successfully!" if email_sent else "❌ Failed to send document. Please try again."
         await sent_message.edit_text(new_text)
 
@@ -276,3 +278,16 @@ async def exit_to_main_menu(message: Message):
 @dp.message(lambda message: message.text == "❌ Cancel")
 async def exit_to_main_menu2(message: Message):
     await message.answer("Returning to main menu.", reply_markup=main_keyboard)
+
+@dp.message(lambda message: message.text == "❌ Cancel")
+async def cancel_many_images(message: Message, state: FSMContext):
+        data = await state.get_data()
+        files = data.get("files", [])
+        for file_path in files:
+            try:
+                os.remove(file_path)
+                logging.info(f"Файл {file_path} успешно удалён при отмене.")
+            except Exception as e:
+                logging.error(f"Не удалось удалить файл {file_path}: {e}")
+        await state.clear()
+        await message.answer("Операция отменена. Все временные файлы удалены.", reply_markup=main_keyboard)
