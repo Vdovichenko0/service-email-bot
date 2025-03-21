@@ -61,8 +61,9 @@ async def request_photo(message: Message):
 @dp.message(lambda message: message.text == "📸 Send a lot Images")
 async def request_many_images(message: Message, state: FSMContext):
     await state.set_state("awaiting_media_group")
-    await state.update_data(media_group_id=None, files=[])
-    await message.answer("📥 Ready! Send multiple images or documents now.", reply_markup=send_many_keyboard)
+    await state.update_data(files=[])
+    await message.answer("📥 Ready! Send multiple images or documents now. When finished, press ✅ Send All.", reply_markup=send_many_keyboard)
+
 
 
 @dp.message(lambda message: message.media_group_id is not None)
@@ -135,16 +136,43 @@ async def send_media_group_files(message: Message, state: FSMContext):
 
 
 @dp.message(lambda message: message.photo or message.document)
-async def receive_any_file(message: Message):
+async def receive_any_file(message: Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state == "awaiting_media_group":
+        # Режим групповой отправки: собираем все файлы в список
+        state_data = await state.get_data()
+        files = state_data.get("files", [])
+
+        if message.photo:
+            file = message.photo[-1]
+            ext = "jpg"
+        elif message.document:
+            file = message.document
+            ext = file.file_name.split(".")[-1]
+        else:
+            await message.answer("❌ Unsupported file type.")
+            return
+
+        filename = f"content/tmp/{message.from_user.id}_{uuid4()}.{ext}"
+        try:
+            file_info = await bot.get_file(file.file_id)
+            await bot.download(file_info, filename)
+            files.append(filename)
+            await state.update_data(files=files)
+            logging.info(f"📎 [GROUP] Файл добавлен: {filename}")
+        except Exception as e:
+            logging.error(f"❌ Ошибка загрузки файла (группа): {e}")
+        return  # не обрабатываем как одиночное сообщение
+
+    # Если не в режиме групповой отправки – обычная логика
     if message.photo:
-        await process_compressed_photo(message)  # 📷 Сжатое фото
+        await process_compressed_photo(message)
     elif message.document and message.document.mime_type.startswith("image/"):
-        await process_original_photo(message)  # 🖼 Фото-документ
-    elif message.document:  # 📄 Документ любого типа
+        await process_original_photo(message)
+    elif message.document:
         await process_document(message)
     else:
-        await message.answer("❌ This is not a valid image or document. Please send a valid file.")
-
+        await message.answer("❌ This is not a valid image or document.")
 
 
 # Обработчик сжатых фото
