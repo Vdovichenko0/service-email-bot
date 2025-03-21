@@ -111,10 +111,11 @@ async def send_media_group_files(message: Message, state: FSMContext):
     user_id = str(message.from_user.id)
     user = await get_by_id(users_collection, user_id)
 
+    name_official = user.name_official if user.name_official else f"User {user_id}"
     success = send_email_with_files(
         to_email=user.recipient,
-        subject=f"📸 Media Group {user.name_official}",
-        message=f"{user.name_official} sent a media group.",
+        subject=f"{name_official}",
+        message=f"{name_official} sent a media group.",
         file_paths=files
     )
 
@@ -160,7 +161,14 @@ async def process_compressed_photo(message: Message):
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
-        email_sent = send_email(user.recipient, f"{user.name_official} New Image", f"{user.name_official} sent a compressed image.", file_path)
+        name_official = user.name_official if user.name_official else f"User {user_id}"
+
+        email_sent = send_email_with_files(
+            to_email=user.recipient,
+            subject=f"{name_official}",
+            message=f"{name_official} sent a compressed image.",
+            file_paths=[file_path]
+        )
 
         new_text = "📨 Your compressed image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
         await sent_message.edit_text(new_text)
@@ -184,7 +192,14 @@ async def process_original_photo(message: Message):
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
-        email_sent = send_email(user.recipient, f"{user.name_official} New High-Quality Image", f"{user.name_official} sent a high-quality image.", file_path)
+        name_official = user.name_official if user.name_official else f"User {user_id}"
+
+        email_sent = send_email_with_files(
+            to_email=user.recipient,
+            subject=f"{name_official}",
+            message=f"{name_official} sent a high-quality image.",
+            file_paths=[file_path]
+        )
 
         new_text = "📨 Your high-quality image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
         await sent_message.edit_text(new_text)
@@ -208,7 +223,14 @@ async def process_document(message: Message):
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
-        email_sent = send_email(user.recipient, f"{user.name_official} New Document", f"{user.name_official} sent a document.", file_path)
+        name_official = user.name_official if user.name_official else f"User {user_id}"
+
+        email_sent = send_email_with_files(
+            to_email=user.recipient,
+            subject=f"{name_official}",
+            message=f"{name_official} sent a document.",
+            file_paths=[file_path]
+        )
 
         new_text = "📨 Your document has been sent successfully!" if email_sent else "❌ Failed to send document. Please try again."
         await sent_message.edit_text(new_text)

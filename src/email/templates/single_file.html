@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject }}</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      padding: 30px;
+      color: #343a40;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #007bff;
+      display: inline-block;
+      line-height: 64px;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .title {
+      font-size: 22px;
+      color: #007bff;
+      margin-top: 10px;
+    }
+    .content {
+      font-size: 15px;
+      margin: 15px 0;
+    }
+    .footer {
+      text-align: center;
+      color: #6c757d;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">📩</div>
+      <div style="text-align: center; margin-bottom: 20px;">
+</div>
+
+      <div class="title">{{ subject }}</div>
+    </div>
+
+<!--    <div class="content">-->
+<!--      {{ message }}-->
+<!--    </div>-->
+
+    <div class="footer">
+      ✅ Sent via Telegram Bot · {{ date }}
+    </div>
+
+  </div>
+</body>
+</html>
