@@ -40,11 +40,11 @@ async def handle_name_official(message: Message, state: FSMContext):
 
 @register_router.message(RegisterStates.choosing_recipient)
 async def handle_recipient_choice(message: Message, state: FSMContext):
-    if message.text not in ["Max", "Erzhan"]:
+    if message.text not in ["Max email", "Erzhan email"]:
         await message.answer("❌ Invalid choice. Please select Max or Erzhan.")
         return
 
-    recipient = EMAIL1 if message.text == "Max" else EMAIL2
+    recipient = EMAIL1 if message.text == "Max email" else EMAIL2
     user_data = await state.get_data()
 
     user_id = str(message.from_user.id)

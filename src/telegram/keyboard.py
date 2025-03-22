@@ -20,8 +20,8 @@ choice_recipient_keyboard = ReplyKeyboardMarkup(
 
 choice_recipient_register_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Max")],  # EMAIL1
-        [KeyboardButton(text="Erzhan")],  # EMAIL2
+        [KeyboardButton(text="Max email")],  # EMAIL1
+        [KeyboardButton(text="Erzhan email")],  # EMAIL2
     ],
     resize_keyboard=True
 )
