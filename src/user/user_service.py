@@ -46,7 +46,7 @@ async def increment_sent_emails(users_collection: AsyncIOMotorCollection, user_i
 
     if result.modified_count > 0:
         return "Sent emails count increased!"
-    return "User not found!"
+    return "Error!"
 
 
 async def set_recipient(users_collection: AsyncIOMotorCollection, user_id: str, recipient: str):
@@ -56,8 +56,8 @@ async def set_recipient(users_collection: AsyncIOMotorCollection, user_id: str, 
     )
 
     if result.modified_count > 0:
-        return f"Recipient updated to {recipient}!"
-    return "User not found!"
+        return f"Recipient updated!"
+    return "Error!"
 
 
 async def get_by_id(users_collection: AsyncIOMotorCollection, user_id: str):
