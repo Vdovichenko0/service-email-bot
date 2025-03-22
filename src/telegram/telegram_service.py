@@ -17,8 +17,8 @@ if not TELEGRAM_BOT_TOKEN:
     raise ValueError("TELEGRAM_TOKEN null")
 
 EMAIL1 = os.getenv("TO_EMAIL1")
-EMAIL2 = os.getenv("TO_EMAIL2")
-
+# EMAIL2 = os.getenv("TO_EMAIL2")
+ARIE_EMAIL = os.getenv("ARIE_EMAIL")
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -38,14 +38,14 @@ async def start_telegram_bot():
 
 
 
-@dp.message(lambda message: message.text == "Choice recipient")
+@dp.message(lambda message: message.text == "📤 Choose recipient")
 async def choice_recipient(message: Message):
     await message.answer("📤 Choose where to send files:", reply_markup=choice_recipient_keyboard)
 
-@dp.message(lambda message: message.text in ["Max", "Erzhan"])
+@dp.message(lambda message: message.text in ["Max", "Arie"])
 async def set_recipient_choice(message: Message):
     user_id = str(message.from_user.id)
-    recipient = EMAIL1 if message.text == "Max" else EMAIL2
+    recipient = EMAIL1 if message.text == "Max" else ARIE_EMAIL
 
     # Обновляем в БД
     update_result = await set_recipient(users_collection, user_id, recipient)
@@ -53,12 +53,12 @@ async def set_recipient_choice(message: Message):
     await message.answer(update_result, reply_markup=main_keyboard)
 
 #Send Photo
-@dp.message(lambda message: message.text == "📸 Send Image")
-async def request_photo(message: Message):
-    await message.answer("We are ready! Send any image.")
+# @dp.message(lambda message: message.text == "📸 Send Image")
+# async def request_photo(message: Message):
+#     await message.answer("We are ready! Send any image.")
 
 #Send many Photos
-@dp.message(lambda message: message.text == "📸 Send a lot Images")
+@dp.message(lambda message: message.text == "📸 Send a lot of Images")
 async def request_many_images(message: Message, state: FSMContext):
     await state.set_state("awaiting_media_group")
     await state.update_data(files=[])

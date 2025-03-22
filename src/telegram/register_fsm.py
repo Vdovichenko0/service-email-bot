@@ -9,8 +9,8 @@ from src.configs.mongodb import users_collection
 from src.telegram.keyboard import main_keyboard, choice_recipient_register_keyboard
 
 EMAIL1 = os.getenv("TO_EMAIL1")
-EMAIL2 = os.getenv("TO_EMAIL2")
-
+# EMAIL2 = os.getenv("TO_EMAIL2")
+ARIE_EMAIL = os.getenv("ARIE_EMAIL")
 register_router = Router()
 
 class RegisterStates(StatesGroup):
@@ -44,7 +44,7 @@ async def handle_recipient_choice(message: Message, state: FSMContext):
         await message.answer("❌ Invalid choice. Please select Max or Erzhan.")
         return
 
-    recipient = EMAIL1 if message.text == "Max email" else EMAIL2
+    recipient = EMAIL1 if message.text == "Max email" else ARIE_EMAIL
     user_data = await state.get_data()
 
     user_id = str(message.from_user.id)
