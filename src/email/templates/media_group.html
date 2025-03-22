@@ -1,64 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>{{ subject }}</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f2f5;
-      padding: 30px;
-      color: #212529;
-    }
-    .wrapper {
-      max-width: 640px;
-      margin: auto;
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .logo {
-      font-size: 48px;
-    }
-    .title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #0056b3;
-      margin-top: 10px;
-    }
-    .message {
-      font-size: 16px;
-      margin-top: 15px;
-      line-height: 1.6;
-    }
-    .footer {
-      margin-top: 25px;
-      text-align: center;
-      font-size: 12px;
-      color: #999;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>{{ subject }}</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            padding: 30px;
+            color: #212529;
+        }
+
+        .wrapper {
+            max-width: 640px;
+            margin: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 48px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0056b3;
+            margin-top: 10px;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrapper">
+<div class="wrapper">
     <div class="header">
-      <div class="logo">📩</div>
-      <div class="title">{{ subject }}</div>
+        <div class="logo">📩</div>
+        <div class="title">{{ subject }}</div>
     </div>
 
-<!--    <div class="message">-->
-<!--      {{ message }}-->
-<!--    </div>-->
+    <!--    <div class="message">-->
+    <!--      {{ message }}-->
+    <!--    </div>-->
 
     <div class="footer">
-      📎 Attached files: {{ files_count }}<br>
-      ✅ Sent from Telegram Bot · {{ date }}
+        📎 Attached files: {{ files_count }}<br>
+        ✅ Sent from <a href="https://t.me/lawyer_email_Bot" style="color: #0056b3; text-decoration: none;"><strong>@lawyer_email_Bot</strong></a>
+        · {{ date }}
     </div>
-  </div>
+
+</div>
 </body>
 </html>
