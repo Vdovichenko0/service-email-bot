@@ -24,7 +24,9 @@ async def register_user(
             sent_emails_count=0,
             created_at=datetime.utcnow(),
         )
-        await users_collection.insert_one(new_user.model_dump(by_alias=True))
+        res = await users_collection.insert_one(new_user.model_dump(by_alias=True))
+        print("Inserted ID:", res.inserted_id)
+
         return "🎉 Registered successfully!"
 
     if phone_number and not existing_user.get("phone_number"):

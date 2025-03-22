@@ -50,7 +50,7 @@ async def handle_recipient_choice(message: Message, state: FSMContext):
     user_id = str(message.from_user.id)
     name = message.from_user.full_name
     nickname = message.from_user.username or ""
-    phone_number = message.from_user.phone_number or None
+    phone_number = None
 
     response_message = await register_user(
         users_collection=users_collection,

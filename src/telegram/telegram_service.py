@@ -10,6 +10,7 @@ from src.user.user_service import set_recipient, get_by_id, increment_sent_email
 from src.configs.mongodb import users_collection
 from src.email.email_service import send_email, send_email_with_files
 from src.telegram.keyboard import main_keyboard, choice_recipient_keyboard, send_many_keyboard
+from src.telegram.user_filter import AccessMiddleware
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 if not TELEGRAM_BOT_TOKEN:
@@ -22,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
-
+dp.message.middleware(AccessMiddleware())
 dp.include_router(register_router)
 
 
@@ -177,7 +178,7 @@ async def receive_any_file(message: Message, state: FSMContext):
 
 # Обработчик сжатых фото
 async def process_compressed_photo(message: Message):
-    sent_message = await message.answer("📸 Image received, processing...")
+    sent_message = await message.answer("📸 Photo received, processing...")
     await asyncio.sleep(1)
 
     photo = message.photo[-1]
@@ -185,8 +186,7 @@ async def process_compressed_photo(message: Message):
 
     try:
         file_info = await bot.get_file(photo.file_id)
-        await bot.download(file_info.file_path, file_path)
-
+        await bot.download(file_info, file_path)
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -198,10 +198,10 @@ async def process_compressed_photo(message: Message):
             message=f"{name_official} sent a compressed image.",
             file_paths=[file_path]
         )
-        await increment_sent_emails(users_collection, user_id)
+
         new_text = "📨 Your compressed image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
         await sent_message.edit_text(new_text)
-
+        await increment_sent_emails(users_collection, user_id)
     except Exception as e:
         await sent_message.edit_text(f"❌ Error processing the image: {str(e)}")
 
@@ -209,7 +209,7 @@ async def process_compressed_photo(message: Message):
 
 # Обработчик оригинальных фото (документ)
 async def process_original_photo(message: Message):
-    sent_message = await message.answer("📸 High-quality image received, processing...")
+    sent_message = await message.answer("📸 High-quality photo received, processing...")
     await asyncio.sleep(1)
 
     document = message.document
@@ -217,7 +217,7 @@ async def process_original_photo(message: Message):
 
     try:
         file_info = await bot.get_file(document.file_id)
-        await bot.download(file_info.file_path, file_path)
+        await bot.download(file_info, file_path)
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -230,11 +230,12 @@ async def process_original_photo(message: Message):
             file_paths=[file_path]
         )
         await increment_sent_emails(users_collection, user_id)
-        new_text = "📨 Your high-quality image has been sent successfully!" if email_sent else "❌ Failed to send image. Please try again."
+
+        new_text = "📨 Your high-quality photo has been sent successfully!" if email_sent else "❌ Failed to send photo. Please try again."
         await sent_message.edit_text(new_text)
 
     except Exception as e:
-        await sent_message.edit_text(f"❌ Error processing the image: {str(e)}")
+        await sent_message.edit_text(f"❌ Error processing the photo: {str(e)}")
 
 
 
@@ -248,8 +249,7 @@ async def process_document(message: Message):
 
     try:
         file_info = await bot.get_file(document.file_id)
-        await bot.download(file_info.file_path, file_path)
-
+        await bot.download(file_info, file_path)
 
         user_id = str(message.from_user.id)
         user = await get_by_id(users_collection, user_id)
@@ -262,11 +262,14 @@ async def process_document(message: Message):
             file_paths=[file_path]
         )
         await increment_sent_emails(users_collection, user_id)
+
         new_text = "📨 Your document has been sent successfully!" if email_sent else "❌ Failed to send document. Please try again."
         await sent_message.edit_text(new_text)
 
     except Exception as e:
         await sent_message.edit_text(f"❌ Error processing the document: {str(e)}")
+
+
 
 
 
