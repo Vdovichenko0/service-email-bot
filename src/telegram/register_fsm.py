@@ -1,7 +1,7 @@
 import os
 from aiogram import Router
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from src.user.user_service import register_user
@@ -20,6 +20,15 @@ class RegisterStates(StatesGroup):
 
 @register_router.message(Command("start"))
 async def start_handler(message: Message, state: FSMContext):
+    await message.answer(
+        "👋 Welcome to *Lawyer Email Bot*!\n\n"
+        "This bot helps you send legal documents and photos directly to your lawyer via email.\n\n"
+        "📤 To begin, please enter your *full official name*.\n"
+        "This is needed to personalize your messages and ensure proper identification.",
+        reply_markup=ReplyKeyboardRemove(),
+        parse_mode="Markdown"
+    )
+
     user_id = str(message.from_user.id)
     existing_user = await users_collection.find_one({"_id": user_id})
     if existing_user:

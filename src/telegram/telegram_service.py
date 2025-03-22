@@ -2,6 +2,8 @@ import logging
 import os
 import asyncio
 from uuid import uuid4
+
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from src.telegram.register_fsm import register_router
 from aiogram import Bot, Dispatcher
@@ -20,7 +22,7 @@ EMAIL1 = os.getenv("TO_EMAIL1")
 # EMAIL2 = os.getenv("TO_EMAIL2")
 ARIE_EMAIL = os.getenv("ARIE_EMAIL")
 logging.basicConfig(level=logging.INFO)
-
+NAME = os.getenv("NAME")
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
 dp.message.middleware(AccessMiddleware())
@@ -294,3 +296,22 @@ async def cancel_many_images(message: Message, state: FSMContext):
                 logging.error(f"Не удалось удалить файл {file_path}: {e}")
         await state.clear()
         await message.answer("Операция отменена. Все временные файлы удалены.", reply_markup=main_keyboard)
+
+@register_router.message(Command("help"))
+async def help_handler(message: Message):
+    await message.answer(
+        "📖 *How to use Lawyer Email Bot:*\n\n"
+        "1️⃣ To send a single photo or document — just forward it here. Original photos are supported too.\n\n"
+        "2️⃣ Want to send multiple files?\n"
+        "   Tap *📸 Send a lot of Images*, upload everything you need, then press *✅ Send All* to send them all at once.\n\n"
+        "3️⃣ Need to change the recipient?\n"
+        "   Tap *📤 Choose recipient* and select one of the options:\n"
+        "   - Max\n"
+        "   - Arie\n"
+        "   - ❌ Cancel to go back\n\n"
+        "4️⃣ If something isn't working or you need to restart the bot, just press */start*.\n\n"
+        f"5️⃣ Questions? Contact [{NAME}](https://t.me/{NAME[1:]})\n\n"
+        "🤖 *Simple. Fast. Confidential.*",
+        parse_mode="Markdown",
+        disable_web_page_preview=True
+    )
